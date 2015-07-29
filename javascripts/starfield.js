@@ -34,12 +34,29 @@ var Starfield = (function() {
   function setupScene() {
     if ( !scene ) {
       starfield = new THREE.Object3D();
-      addCelestialObjectsTo(starfield, 570, createStar);
-      addCelestialObjectsTo(starfield, 30, createRedDwarf);
-
+      
       scene = new THREE.Scene();
       scene.addObject( starfield );
+
+      Papa.parse("http://maxmahem.net/starfield/hygdata_v3-nearest500.csv", {
+        header: true,
+	download: true,
+	step: addStarsToScene,
+	complete: function() {
+		console.log("All done!");
+	}
+});
+//      $.ajax("hygdata_v3-nearest500.csv").done(addStarsToScene);
     }
+  }
+  
+  function addStarsToScene(starData) {
+    console.log(starData.data[0]);
+    var starX = Number(starData.data[0].x) * 100;
+    var starY = Number(starData.data[0].y) * 100;
+    var starZ = Number(starData.data[0].z) * 100;
+    
+    addStar(starfield, starX, starY, starZ);
   }
 
   function createRenderer() {
@@ -74,19 +91,17 @@ var Starfield = (function() {
     ctx.fillRect(0, 0, 16, 16);
   }
 
-  function addCelestialObjectsTo(group, max, func) {
+  function addStar(group, x, y, z) {
     var celObj;
-    var material = new THREE.ParticleCanvasMaterial({color: 0xffffff, program: func});
+    var material = new THREE.ParticleCanvasMaterial({color: 0xffffff, program: createStar});
 
-    for(var i=0; i < max; ++i) {
-      celObj = new THREE.Particle(material);
-      celObj.position.x = Math.random() * 2000 - 1000;
-      celObj.position.y = Math.random() * 2000 - 1000;
-      celObj.position.z = Math.random() * 2000 - 1000;
-      celObj.scale.x = celObj.scale.y = Math.random() * 2;
+    celObj = new THREE.Particle(material);
+    celObj.position.x = x;
+    celObj.position.y = y;
+    celObj.position.z = z;
+    celObj.scale.x = celObj.scale.y = Math.random() * 2;
 
-      group.addChild(celObj);
-    }
+    group.addChild(celObj);
   }
 
   // ---------------------------------------------------------------------------
