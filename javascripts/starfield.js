@@ -4,6 +4,7 @@ var Starfield = (function() {
   var camera, scene, renderer;
   var starfield;
   var mouseX = 0, mouseY = 0;
+  var starsLoaded = 0;
 
   function initialize(element) {
     container = ( typeof element == 'string') ? document.getElementById(element) : element;
@@ -38,25 +39,29 @@ var Starfield = (function() {
       scene = new THREE.Scene();
       scene.addObject( starfield );
 
-      Papa.parse("http://maxmahem.net/starfield/hygdata_v3-nearest500.csv", {
+      Papa.parse("http://maxmahem.net/starfield/hygdata_v3-nearestfirst.csv", {
         header: true,
+        preview: 10000,
 	download: true,
-	step: addStarsToScene,
-	complete: function() {
-		console.log("All done!");
-	}
-});
-//      $.ajax("hygdata_v3-nearest500.csv").done(addStarsToScene);
+        worker: true,
+        fastmode: true, // we can use this because there are no quotes in our data file.
+	step: addStarToScene
+        });
     }
   }
   
-  function addStarsToScene(starData) {
-    console.log(starData.data[0]);
+  function addStarToScene(starData) {
+//    console.log(starData.data[0]);
     var starX = Number(starData.data[0].x) * 100;
     var starY = Number(starData.data[0].y) * 100;
     var starZ = Number(starData.data[0].z) * 100;
     
     addStar(starfield, starX, starY, starZ);
+    
+    starsLoaded = starsLoaded + 1;
+//    console.log(starsLoaded);
+    
+    $("#progress").text(starsLoaded + " stars loaded");
   }
 
   function createRenderer() {
