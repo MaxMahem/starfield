@@ -119,8 +119,8 @@ var Starfield = (function() {
     camera.position.x += ( mouseX - camera.position.x ) * 0.05;
     camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
-    starfield.rotation.x += 0.005;
-    starfield.rotation.y += 0.01;
+//    starfield.rotation.x += 0.005;
+//    starfield.rotation.y += 0.01;
 
     renderer.render( scene, camera );
   }
