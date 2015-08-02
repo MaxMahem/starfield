@@ -56,9 +56,14 @@ var Starfield = (function() {
     var starY = Number(starData.data[0].y) * 100;
     var starZ = Number(starData.data[0].z) * 100;
     
+    // color is measured in bv, needs to be converted to rgb.
     var starC = bvToRGB(Number(starData.data[0].ci));
     
-    addStar(starfield, starX, starY, starZ, starC);
+    // absolute magnitude ranges from about -16 (very bright) to about 20 (very 
+    // bright). So a range of 36, we divide it by 10.
+    var starS = (Number(starData.data[0].absmag) + 17) / 10;
+    
+    addStar(starfield, starX, starY, starZ, starC, starS);
     
     starsLoaded = starsLoaded + 1;
 //    console.log(starsLoaded);
@@ -74,17 +79,8 @@ var Starfield = (function() {
     }
   }
 
-  // this function adapted from code at: http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color
-  // by Spektre
   function bvToRGB(bv) {
-//    var r, g, b;
-//    var starR, starG, starB;
-//    var t;
     var color;
-    
-    // bounds checking
-//    if (bv < -0.4) { bv = -0.4; }
-//    if (bv >  2.0) { bv =  2.0; }
     
     // this lookup table taken from: http://www.vendian.org/mncharity/dir3/starcolor/details.html
     if                      ((bv < -.40)) { color = 0x9bb2ff; }
@@ -157,7 +153,7 @@ var Starfield = (function() {
     ctx.fillRect(0, 0, 16, 16);
   }
 
-  function addStar(group, x, y, z, color) {
+  function addStar(group, x, y, z, color, absmag) {
     var celObj;
     var material = new THREE.ParticleCanvasMaterial({
         color: 0xffffff,
@@ -169,7 +165,7 @@ var Starfield = (function() {
     celObj.position.x = x;
     celObj.position.y = y;
     celObj.position.z = z;
-    celObj.scale.x = celObj.scale.y = Math.random() * 2;
+    celObj.scale.x = celObj.scale.y = absmag;
 
     group.addChild(celObj);
   }
